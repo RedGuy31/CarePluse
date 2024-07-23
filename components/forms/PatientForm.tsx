@@ -8,9 +8,12 @@ import { UserFormValidation } from "@/lib/validations";
 import "react-phone-number-input/style.css";
 import SubmitButton from "../SubmitButton";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createUser } from "@/lib/actions/patient.actions";
 
 function PatientForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof UserFormValidation>>({
     resolver: zodResolver(UserFormValidation),
@@ -33,9 +36,17 @@ function PatientForm() {
         email,
         phone,
       };
+      console.log(userData);
+
+      const newUser = await createUser(userData);
+
+      if (newUser) {
+        router.push(`/patients/${newUser.$id}/register`);
+      }
     } catch (error) {
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   return (
